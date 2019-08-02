@@ -23,7 +23,7 @@ class UpdateOvhRecordCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('app:ovh:set-ip')
+            ->setName('dynovh:set-ip')
             ->setDescription('Set a new ip for an Ovh record.')
             ->addArgument('ip', InputArgument::OPTIONAL, 'The new ip to set. If null, check the ip from the box.')
         ;
