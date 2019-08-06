@@ -2,22 +2,27 @@
 
 namespace App\Command;
 
+use App\Adapter\ProviderFactory;
 use GuzzleHttp\Exception\RequestException;
 use Ovh\Api;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
 
 class UpdateOvhRecordCommand extends Command
 {
     private $ovh;
 
-    public function __construct(Api $ovh, $name = null)
+    private $factory;
+
+    public function __construct(Api $ovh, ProviderFactory $adapter)
     {
         $this->ovh = $ovh;
-        parent::__construct($name);
+        $this->factory = $adapter;
+        parent::__construct();
     }
 
     protected function configure()
@@ -26,12 +31,24 @@ class UpdateOvhRecordCommand extends Command
             ->setName('dynovh:set-ip')
             ->setDescription('Set a new ip for an Ovh record.')
             ->addArgument('ip', InputArgument::OPTIONAL, 'The new ip to set. If null, check the ip from the box.')
+            ->addOption('provider', 'p', InputOption::VALUE_REQUIRED, 'Your internet provider name.')
         ;
+    }
+
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        if (!$input->getArgument('ip') && !$input->getOption('provider')) {
+            throw new LogicException('If you don\'t provide an ip address, you must set the provider option.');
+        }
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $ip = $input->getArgument('ip') ?? $this->fetchIpFromBox();
+        $ip = $input->getArgument('ip') ?? $this->factory->getProvider($input->getOption('provider'))->fetchIp();
+
+        if (!$ip) {
+            throw new \RuntimeException('Ip not found from the box. Try manually by passing the ip as the first argument of the command.');
+        }
 
         try {
             $this->ovh->put(
@@ -45,25 +62,5 @@ class UpdateOvhRecordCommand extends Command
         }
 
         $output->writeln(sprintf('Ip updated to %s.', $ip));
-    }
-
-    private function fetchIpFromBox()
-    {
-        $process = new Process([
-            'curl',
-            '-s',
-            '-X',
-            'POST',
-            '-H',
-            'Content-Type: application/x-sah-ws-1-call+json',
-            '-d',
-            '{"service":"NMC","method":"getWANStatus","parameters":{}}',
-            'http://192.168.1.1/ws',
-        ]);
-        $process->mustRun();
-
-        $result = \json_decode($process->getOutput(), true);
-
-        return $result['result']['data']['IPAddress'];
     }
 }
