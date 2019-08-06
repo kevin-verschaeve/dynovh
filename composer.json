@@ -1,4 +1,8 @@
 {
+    "name": "keversc/dynovh",
+    "description": "Provide an implementation to to dyndns with ovh.",
+    "version": "0.1.0",
+    "keywords": ["dns", "dyndns", "ovh"],
     "require": {
         "ovh/ovh": "^2.0",
         "symfony/console": "^4.3",
@@ -7,5 +11,11 @@
     },
     "autoload": {
         "psr-4": { "App\\": "src/" }
+    },
+    "license": "MIT",
+    "author": {
+        "name": "Kevin Verschaeve",
+        "email": "kevin.verschaeve@live.fr",
+        "homepage": "https://github.com/kevin-verschaeve"
     }
 }
