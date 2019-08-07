@@ -1,6 +1,6 @@
 {
     "name": "keversc/dynovh",
-    "description": "Provide an implementation to to dyndns with ovh.",
+    "description": "Provide an implementation to dyndns with ovh.",
     "version": "0.1.0",
     "keywords": ["dns", "dyndns", "ovh"],
     "require": {
