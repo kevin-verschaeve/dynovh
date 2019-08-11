@@ -4,7 +4,7 @@ A DynDNS like for ovh
 
 ## How to use it
 
-- clone the repo
+- install it with `composer require keversc/dynovh` or clone this repository
 - run `composer install`
 - copy the `.env.dist` file to a `.env` file : `cp .env.dist .env`
 - [create an application on Ovh and get an api key](https://api.ovh.com/createToken/index.cgi)
@@ -20,6 +20,12 @@ php index.php dynovh:set-ip 127.0.0.1
 ```
 
 If no ip is provided, it will fetch it from a webservice on your internet provider box.
+
+To do so, you will need to provide the internet provider name to the command via the `--provider` (or `-p) option :
+
+```
+php index.php dynovh:set-ip -p orange
+```
 
 Then, it will update your ovh dns record with this new ip address, using the Ovh api.
 
