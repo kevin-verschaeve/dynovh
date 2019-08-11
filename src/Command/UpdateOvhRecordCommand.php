@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Adapter\ProviderFactory;
+use App\Factory\ProviderFactory;
 use GuzzleHttp\Exception\RequestException;
 use Ovh\Api;
 use Symfony\Component\Console\Command\Command;

@@ -2,7 +2,7 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
-use App\Adapter\ProviderFactory;
+use App\Factory\ProviderFactory;
 use App\Command\UpdateOvhRecordCommand;
 use Ovh\Api;
 use Symfony\Component\Console\Application;
