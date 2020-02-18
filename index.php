@@ -6,12 +6,10 @@ use App\Factory\ProviderFactory;
 use App\Command\UpdateOvhRecordCommand;
 use Ovh\Api;
 use Symfony\Component\Console\Application;
-use Symfony\Component\Dotenv\Dotenv;
+use Symfony\Component\Yaml\Yaml;
 
-(new Dotenv())->load(__DIR__.'/.env');
-
-$ovh = new Api($_ENV['OVH_APP_KEY'], $_ENV['OVH_APP_SECRET'], 'ovh-eu', $_ENV['OVH_CONSUMER_KEY']);
+$config = Yaml::parseFile(__DIR__.'/config/ovh.yaml');
+$ovh = new Api($config['app_key'], $config['app_secret'], $config['api_endpoint'] ?? 'ovh-eu', $config['consumer_key']);
 $application = new Application();
 $application->add(new UpdateOvhRecordCommand($ovh, new ProviderFactory()));
 $application->run();
-

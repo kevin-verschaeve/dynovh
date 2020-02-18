@@ -15,13 +15,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 class UpdateOvhRecordCommand extends Command
 {
     private $ovh;
-
     private $factory;
 
-    public function __construct(Api $ovh, ProviderFactory $adapter)
+    public function __construct(Api $ovh, ProviderFactory $factory)
     {
         $this->ovh = $ovh;
-        $this->factory = $adapter;
+        $this->factory = $factory;
         parent::__construct();
     }
 
@@ -30,6 +29,7 @@ class UpdateOvhRecordCommand extends Command
         $this
             ->setName('dynovh:set-ip')
             ->setDescription('Set a new ip for an Ovh record.')
+            ->addArgument('zone', InputArgument::REQUIRED, 'The OVH dns zone to change the ip to.')
             ->addArgument('ip', InputArgument::OPTIONAL, 'The new ip to set. If null, check the ip from the box.')
             ->addOption('provider', 'p', InputOption::VALUE_REQUIRED, 'Your internet provider name.')
         ;
@@ -47,12 +47,13 @@ class UpdateOvhRecordCommand extends Command
         $ip = $input->getArgument('ip') ?? $this->factory->getProvider($input->getOption('provider'))->fetchIp();
 
         if (!$ip) {
-            throw new \RuntimeException('Ip not found from the box. Try manually by passing the ip as the first argument of the command.');
+            throw new \RuntimeException('Ip not found from the box. Try manually by passing the ip as the second argument of the command.');
         }
 
         try {
+            $record = $this->ovh->get(sprintf('/domain/zone/%s/record?fieldType=A', $input->getArgument('zone')))[0];
             $this->ovh->put(
-                sprintf('/domain/zone/%s/record/%d', $_ENV['OVH_ZONE_NAME'], $_ENV['OVH_RECORD_ID']),
+                sprintf('/domain/zone/%s/record/%d', $input->getArgument('zone'), $record),
                 ['target' => $ip]
             );
         } catch (RequestException $e) {
