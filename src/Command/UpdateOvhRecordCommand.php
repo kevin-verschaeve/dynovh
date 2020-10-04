@@ -53,7 +53,7 @@ class UpdateOvhRecordCommand extends Command
         try {
             $record = $this->ovh->get(sprintf('/domain/zone/%s/record?fieldType=A', $input->getArgument('zone')))[0];
             $this->ovh->put(
-                sprintf('/domain/zone/%s/record/%d', $input->getArgument('zone'), $record),
+                sprintf('/domain/zone/%s/record/%f', $input->getArgument('zone'), $record),
                 ['target' => $ip]
             );
         } catch (RequestException $e) {
